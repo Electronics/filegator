@@ -48,8 +48,10 @@ class DownloadController
     public function download(Request $request, Response $response, ViewInterface $view, StreamedResponse $streamedResponse)
     {
         try {
+            $filename = urldecode((string) $request->server->get("REQUEST_URI"));
+            error_log("Attempting to download '$filename'");
             if (empty($request->input('path'))) {
-                $file = $this->storage->readStream((string) $request->server->get("REQUEST_URI"));
+                $file = $this->storage->readStream($filename);
             } else {
                 $file = $this->storage->readStream((string) base64_decode($request->input('path')));
             }
