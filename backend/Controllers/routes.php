@@ -140,7 +140,18 @@ return [
     ],
     [
         'route' => [
-            'POST', '/api/deleteitems', '\Filegator\Controllers\FileController@deleteItems',
+            'POST', '/chmoditems', '\Filegator\Controllers\FileController@chmodItems',
+        ],
+        'roles' => [
+            'guest', 'user', 'admin',
+        ],
+        'permissions' => [
+            'read', 'write', 'chmod',
+        ],
+    ],
+    [
+        'route' => [
+            'POST', '/deleteitems', '\Filegator\Controllers\FileController@deleteItems',
         ],
         'roles' => [
             'guest', 'user', 'admin',

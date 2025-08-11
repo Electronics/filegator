@@ -100,6 +100,12 @@
               </a>
             </b-table-column>
 
+            <b-table-column v-if="can(['write', 'chmod'])" :label="lang('Permissions')" field="data.permissions" sortable width="130">
+            <span @click="togglePermissionsView" :title="showSymbolic ? lang('Hide symbolic format') : lang('Show symbolic format')" style="font-family: monospace;cursor: pointer;">
+              {{ formatPermissions(props.row.permissions, props.row.type) }}
+            </span>
+            </b-table-column>
+
             <b-table-column :label="lang('Size')" :custom-sort="sortBySize" field="data.size" sortable numeric width="150">
               {{ props.row.type == 'back' || props.row.type == 'dir' ? lang('Folder') : formatBytes(props.row.size) }}
             </b-table-column>
@@ -135,6 +141,9 @@
                 <b-dropdown-item v-if="can(['write', 'zip']) && ! isArchive(props.row)" aria-role="listitem" @click="zip($event, props.row)">
                   <b-icon icon="file-archive" size="is-small" /> {{ lang('Zip') }}
                 </b-dropdown-item>
+                <b-dropdown-item v-if="can(['write', 'chmod']) && props.row.permissions !== -1" aria-role="listitem" @click="chmod($event, props.row)">
+                  <b-icon icon="lock" size="is-small" /> {{ lang('Permissions') }} ({{ props.row.permissions }})
+                </b-dropdown-item>
                 <b-dropdown-item v-if="can('write')" aria-role="listitem" @click="remove($event, props.row)">
                   <b-icon icon="trash-alt" size="is-small" /> {{ lang('Delete') }}
                 </b-dropdown-item>
@@ -167,6 +176,7 @@
 import Vue from 'vue'
 import Menu from './partials/Menu'
 import Tree from './partials/Tree'
+import Permissions from './partials/Permissions'
 import Editor from './partials/Editor'
 import Gallery from './partials/Gallery'
 import Search from './partials/Search'
@@ -185,7 +195,7 @@ export default {
   data() {
     return {
       dropZone: false,
-      perPage: '',
+      perPage: this.$store.state.config.pagination[0],
       currentPage: 1,
       checked: [],
       isLoading: false,
@@ -193,6 +203,7 @@ export default {
       files: [],
       hasFilteredEntries: false,
       showAllEntries: false,
+      showSymbolic: false,
     }
   },
   computed: {
@@ -250,6 +261,27 @@ export default {
       this.showAllEntries = !this.showAllEntries
       this.loadFiles()
       this.checked = []
+    },
+    togglePermissionsView() {
+    this.showSymbolic = !this.showSymbolic
+  },
+  formatPermissions(permissions, type) {
+    if (permissions === -1) return
+    const numeric = permissions.toString()
+    if (this.showSymbolic) {
+      const symbolic = this.convertToSymbolic(permissions, type)
+      return `[${symbolic}]`
+    }
+    return numeric
+  },
+    convertToSymbolic(permissions, type) {
+      if (permissions === -1) return ''
+        const symbols = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx']
+        const owner = symbols[Math.floor(permissions / 100) % 10]
+        const group = symbols[Math.floor(permissions / 10) % 10]
+        const others = symbols[permissions % 10]
+        const prefix = type === 'dir' ? 'd' : '-'
+      return `${prefix}${owner}${group}${others}`
     },
     filterEntries(files){
       var filter_entries = this.$store.state.config.filter_entries
@@ -493,6 +525,37 @@ export default {
             })
           this.checked = []
         }
+      })
+    },
+    chmod(event, item) {
+      this.$modal.open({
+        parent: this,
+        hasModalCard: true,
+        component: Permissions,
+        props: {
+          name: item.name,
+          permissions: item.permissions,
+          isDir: item.type == 'dir',
+        },
+        events: {
+          saved: (permissions, recursive = null) => {
+            this.isLoading = true
+            api.chmodItems({
+              items: item ? [item] : this.getSelected(),
+              permissions: permissions,
+              recursive: recursive,
+            })
+              .then(() => {
+                this.isLoading = false
+                this.loadFiles()
+              })
+              .catch(error => {
+                this.isLoading = false
+                this.handleError(error)
+              })
+            this.checked = []
+          }
+        },
       })
     },
     rename(event, item) {
