@@ -19,6 +19,7 @@ use Filegator\Services\Auth\AuthInterface;
 use Filegator\Services\Session\SessionStorageInterface as Session;
 use Filegator\Services\Storage\Filesystem;
 use Filegator\Services\Tmpfs\TmpfsInterface;
+use Filegator\Services\View\ViewInterface;
 use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\Mime\MimeTypes;
 
@@ -52,11 +53,18 @@ class DownloadController
         $this->storage->setPathPrefix($user->getHomeDir());
     }
 
-    public function download(Request $request, Response $response, StreamedResponse $streamedResponse)
+    public function download(Request $request, Response $response, ViewInterface $view, StreamedResponse $streamedResponse)
     {
         try {
-            $file = $this->storage->readStream((string) base64_decode($request->input('path')));
+            if (empty($request->input('path'))) {
+                $file = $this->storage->readStream((string) $request->server->get("REQUEST_URI"));
+            } else {
+                $file = $this->storage->readStream((string) base64_decode($request->input('path')));
+            }
         } catch (\Exception $e) {
+            if ($e->getMessage()=='Cannot stream directory') {
+                return $response->html($view->getIndexPage());
+            } 
             return $response->redirect('/');
         }
 

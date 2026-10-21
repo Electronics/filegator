@@ -15,10 +15,10 @@ import '@fortawesome/fontawesome-free/css/fontawesome.css'
 Vue.config.productionTip = false
 
 /* eslint-disable-next-line */
-Vue.config.baseURL = process.env.VUE_APP_API_ENDPOINT ? process.env.VUE_APP_API_ENDPOINT : window.location.origin+window.location.pathname+'?r='
+Vue.config.baseURL = process.env.VUE_APP_API_ENDPOINT ? process.env.VUE_APP_API_ENDPOINT : "/dist/"
 
 axios.defaults.withCredentials = true
-axios.defaults.baseURL = Vue.config.baseURL
+axios.defaults.baseURL = '/api/' //Vue.config.baseURL
 
 axios.defaults.headers['Content-Type'] = 'application/json'
 
@@ -30,13 +30,13 @@ Vue.use(VueLazyload, {
   preLoad: 1.3,
 })
 
-
 Vue.mixin(shared)
 
-new Vue({
+window.vue = new Vue({
   router,
   store,
   created: function() {
+      window.vueapi = api
 
     api.getConfig()
       .then(ret => {
@@ -45,7 +45,13 @@ new Vue({
           .then((user) => {
             this.$store.commit('initialize')
             this.$store.commit('setUser', user)
-            this.$router.push('/').catch(() => {})
+            // todo: maybe catch if the directory doesn't exist?
+            console.log('Opened with directory: '+window.location.pathname.replace('/#/','')+', so changing to that.')
+            // this first route by itself doesn't work, for whatever reason, so go to the root
+            this.$router.push({name: 'browser', query: {'cd': "/"}}).catch(() => {}).then(()=>{
+              // now finally to where we want to go
+              this.$router.push({ name: 'browser', query: { 'cd': window.location.pathname.replace('/#/','') }}).catch(() => {})
+            })
           })
           .catch(() => {
             this.$notification.open({

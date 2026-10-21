@@ -70,7 +70,6 @@
 
 <script>
 import Resumable from 'resumablejs'
-import Vue from 'vue'
 import api from '../../api/api'
 import axios from 'axios'
 import _ from 'lodash'
@@ -121,7 +120,7 @@ export default {
   },
   mounted() {
     this.resumable = new Resumable({
-      target: Vue.config.baseURL+'/upload',
+      target: axios.defaults.baseURL +'upload',
       headers: {
         'x-csrf-token': axios.defaults.headers.common['x-csrf-token']
       },
