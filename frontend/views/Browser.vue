@@ -438,7 +438,7 @@ export default {
         })
     },
     download(item) {
-      window.open(this.getDownloadLink(item.path), '_blank')
+      window.open(this.getDownloadLinkBase64(item.path), '_blank')
     },
     search() {
       this.$modal.open({

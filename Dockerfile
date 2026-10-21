@@ -23,6 +23,7 @@ RUN git clone https://github.com/Electronics/filegator.git /var/www/filegator/
 WORKDIR "/var/www/filegator/"
 RUN cp configuration_sample.php configuration.php
 RUN composer install
+RUN composer config --no-interaction policy.advisories.block false
 RUN composer require league/flysystem-sftp:^1.0 -W
 RUN composer require league/flysystem-aws-s3-v3:^1.0 -W
 RUN npm install

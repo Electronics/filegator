@@ -45,12 +45,17 @@ window.vue = new Vue({
           .then((user) => {
             this.$store.commit('initialize')
             this.$store.commit('setUser', user)
-            // todo: maybe catch if the directory doesn't exist?
-            console.log('Opened with directory: '+window.location.pathname.replace('/#/','')+', so changing to that.')
-            // this first route by itself doesn't work, for whatever reason, so go to the root
+            // Navigate to the URL's pathname as the initial directory, unless it
+            // looks like a file path (e.g. /report.pdf) — file URLs are handled
+            // by the PHP DownloadController in production but would show a stuck
+            // empty directory in dev.
+            const rawPath = window.location.pathname.replace('/#/', '')
+            const isFilePath = rawPath !== '/' && /\/[^/]*\.[^/]+$/.test(rawPath)
+            const initialDir = isFilePath ? '/' : rawPath
+            // The first push to root is needed as a warm-up; a direct push alone
+            // doesn't always fire the $route watcher on the initial load.
             this.$router.push({name: 'browser', query: {'cd': "/"}}).catch(() => {}).then(()=>{
-              // now finally to where we want to go
-              this.$router.push({ name: 'browser', query: { 'cd': window.location.pathname.replace('/#/','') }}).catch(() => {})
+              this.$router.push({ name: 'browser', query: { 'cd': initialDir }}).catch(() => {})
             })
           })
           .catch(() => {

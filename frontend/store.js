@@ -25,6 +25,7 @@ export default new Vuex.Store({
   },
   getters: {
     hasPermissions: (state) => (permissions) => {
+      if (!state.user) return false
       if (_.isArray(permissions)) {
         return _.intersection(state.user.permissions, permissions).length == permissions.length
       }
@@ -55,7 +56,7 @@ export default new Vuex.Store({
       state.config = {...state.config, ...data}
     },
     setUser(state, data) {
-      state.user = data
+      if (data) state.user = data
     },
     destroyUser(state) {
       state.user = {

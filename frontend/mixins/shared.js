@@ -97,7 +97,7 @@ const funcs = {
       })
     },
     is(role) {
-      return this.$store.state.user.role == role
+      return this.$store.state.user && this.$store.state.user.role == role
     },
     can(permissions) {
       return this.$store.getters.hasPermissions(permissions)

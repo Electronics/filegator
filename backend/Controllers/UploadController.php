@@ -53,7 +53,7 @@ class UploadController
             return $response->json('Chunk exists', 200);
         }
 
-        return $response->json('Chunk does not exists', 204);
+        return $response->json('Chunk does not exist', 422);
     }
 
     public function upload(Request $request, Response $response)
@@ -137,7 +137,7 @@ class UploadController
                 $this->tmpfs->remove($expired_chunk['name']);
             }
 
-            return $res ? $response->json('Stored') : $response->json('Error storing file');
+            return $res ? $response->json('Stored') : $response->json('Error storing file', 422);
         }
 
         return $response->json('Uploaded');

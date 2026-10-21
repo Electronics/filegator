@@ -28,12 +28,16 @@ COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 RUN groupadd -g 1000 app \
     && useradd -m -u 1000 -g app -s /bin/bash app
 
-WORKDIR /var/www/filegator
+WORKDIR "/var/www/filegator/"
 
 RUN chown -R app:app /var/www/filegator
 
 # Copy application
 COPY --chown=app:app . .
+
+# Ensure private dirs and repository are writable by the app user
+RUN mkdir -p private/logs private/sessions repository \
+    && chmod -R 777 private/ repository/
 
 # Switch to non-root BEFORE install
 USER app
