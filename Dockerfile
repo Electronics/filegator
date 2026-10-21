@@ -19,9 +19,9 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 RUN docker-php-ext-install zip
 RUN docker-php-ext-enable zip
 
-RUN git clone https://github.com/Electronics/filegator.git /var/www/filegator/
 WORKDIR "/var/www/filegator/"
-RUN cp configuration_sample.php configuration.php
+COPY . .
+RUN cp -n configuration_sample.php configuration.php || true
 RUN composer install
 RUN composer config --no-interaction policy.advisories.block false
 RUN composer require league/flysystem-sftp:^1.0 -W
