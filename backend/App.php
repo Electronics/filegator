@@ -33,7 +33,7 @@ class App
                 $container->set($key, $container->get($service['handler']));
                 $container->get($key)->init($service['config'] ?? []);
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
 
             if (headers_sent()) {
                 throw $e; // re-throw exceptions for PHPUnit

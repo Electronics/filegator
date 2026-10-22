@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.3.36-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -44,7 +44,7 @@ USER app
 
 # Install dependencies as non-root
 RUN composer install
-RUN npm ci
+RUN npm install
 
 # Dev config
 RUN cp -n configuration_sample.php configuration.php || true

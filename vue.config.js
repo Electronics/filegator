@@ -51,6 +51,11 @@ module.exports = {
           if (url === '/' || url.startsWith('/?') ||
               url === '/main.html' || url === '/index.html' ||
               url === '/favicon.ico') return url
+          // Directory paths (trailing slash): serve the SPA so main.js can
+          // read window.location.pathname and navigate to that directory.
+          // File paths with extensions (e.g. /report.pdf) fall through to PHP.
+          const path = url.split('?')[0]
+          if (path.endsWith('/')) return '/main.html'
           // Any other path (e.g. /report.pdf, /subdir/black.html) → PHP
         },
       },

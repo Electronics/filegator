@@ -20,7 +20,7 @@ Vue.config.baseURL = process.env.VUE_APP_API_ENDPOINT ? process.env.VUE_APP_API_
 axios.defaults.withCredentials = true
 axios.defaults.baseURL = '/api/' //Vue.config.baseURL
 
-axios.defaults.headers['Content-Type'] = 'application/json'
+axios.defaults.headers.common['Content-Type'] = 'application/json'
 
 Vue.use(Buefy, {
   defaultIconPack: 'fas',

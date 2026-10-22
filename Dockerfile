@@ -1,7 +1,7 @@
 #################################
 # stage builder: build and test
 #################################
-FROM php:8.3-apache AS builder
+FROM php:8.3.36-apache AS builder
 
 
 RUN apt-get update > /dev/null
