@@ -37,7 +37,7 @@ RUN rm -f README.md couscous.yml repository/.gitignore babel.config.js cypress* 
 #################################
 # stage production
 #################################
-FROM php:8.3-apache
+FROM php:8.3.36-apache
 
 RUN apt-get update > /dev/null
 RUN apt-get install -y git libzip-dev libldap2-dev
