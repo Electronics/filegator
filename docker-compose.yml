@@ -6,5 +6,8 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - /opt/filegator/repository:/var/www/filegator/repository
-      - /opt/filegator/private:/var/www/filegator/private
+      - /var/www/files:/var/www/filegator/repository
+      - private:/var/www/filegator/private
+      - ./configuration.php:/var/www/filegator/configuration.php
+volumes:
+  private:
