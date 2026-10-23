@@ -49,8 +49,7 @@ RUN docker-php-ext-enable zip ldap
 COPY --from=builder /var/www/filegator /var/www/filegator
 RUN chown -R www-data:www-data /var/www/filegator/
 WORKDIR "/var/www/filegator/"
-RUN chmod -R g+w private/
-RUN chmod -R g+w repository/
+RUN mkdir -p private/logs private/sessions repository && chmod -R g+w private/ repository/
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/filegator/dist/
 ENV APACHE_PORT=8080
